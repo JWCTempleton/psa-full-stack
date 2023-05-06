@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const cardsRouter = require("./controllers/cards");
 const usersRouter = require("./controllers/users");
+const loginRouter = require("./controllers/login");
 
 dotenv.config();
 
@@ -23,3 +24,4 @@ app.listen(port, () => {
 
 app.use("/api/cards", cardsRouter);
 app.use("/api/users", usersRouter);
+app.use("/api/login", loginRouter);
