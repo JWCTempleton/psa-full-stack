@@ -43,7 +43,7 @@ router.get("/", async (req, res, next) => {
 
 router.get("/:id", async (req, res, next) => {
   const id = parseInt(req.params.id);
-  const query = "SELECT * FROM cards WHERE id=$1";
+  const query = "SELECT * FROM cards WHERE card_id=$1";
   const value = [id];
 
   try {
@@ -78,7 +78,7 @@ router.post("/", tokenExtractor, async (req, res, next) => {
 
     const cardQuery =
       "INSERT INTO cards(company, description, notes, user_id) VALUES($1,$2,$3,$4) RETURNING *;";
-    const cardValues = [company, description, notes, user.user_id];
+    const cardValues = [company, description, notes || null, user.user_id];
 
     const cardData = await pool.query(cardQuery, cardValues);
 
@@ -86,6 +86,27 @@ router.post("/", tokenExtractor, async (req, res, next) => {
       status: 201,
       message: "Card added successfully",
       data: cardData.rows,
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.delete("/:id", async (req, res, next) => {
+  const id = parseInt(req.params.id);
+  const query = "DELETE FROM cards where card_id=$1";
+  const value = [id];
+
+  try {
+    const data = await pool.query(query, value);
+
+    if (data.rowCount == 0) {
+      return res.status(404).send("Card does not exist");
+    }
+
+    return res.status(200).json({
+      status: 200,
+      message: "Card successfully deleted",
     });
   } catch (error) {
     return next(error);
