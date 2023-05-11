@@ -25,16 +25,33 @@ const tokenExtractor = (req, res, next) => {
 
 router.get("/", async (req, res, next) => {
   try {
-    const data = await pool.query("SELECT * FROM cards;");
+    const data = await pool.query(
+      "SELECT c.*, u.user_id, u.username FROM cards c JOIN users u on c.user_id=u.user_id;"
+    );
 
     if (data.rowCount == 0) {
       return res.status(404).send("No card exists");
     }
 
+    const returnedValue = [];
+    data.rows.map((card) => {
+      returnedValue.push({
+        id: card.card_id,
+        company: card.company,
+        description: card.description,
+        notes: card.notes,
+        status: card.status,
+        created_at: card.created_at,
+        user: {
+          user_id: card.user_id,
+          username: card.username,
+        },
+      });
+    });
     return res.status(200).json({
       status: 200,
       message: "All cards",
-      data: data.rows,
+      data: returnedValue,
     });
   } catch (error) {
     return next(error);
