@@ -45,7 +45,12 @@ router.post("/", async (req, res, next) => {
 
     return res
       .status(200)
-      .send({ token, username: user.username, name: user.name });
+      .send({
+        token,
+        username: user.username,
+        name: user.name,
+        admin: user.admin,
+      });
   } catch (error) {
     return next(error);
   }
